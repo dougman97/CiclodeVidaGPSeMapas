@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private double latitude, longitude;
+    private ArrayList<Location> locaisRecentes;
 
     private static final int REQUEST_PERMISSION_CODE_GPS = 1001;
 
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         locationTextView = findViewById(R.id.locationTextView);
         locationTextInput = findViewById(R.id.locationTextInput);
+        locaisRecentes = new ArrayList<>();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -64,6 +67,9 @@ public class MainActivity extends AppCompatActivity {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                locaisRecentes.add(location);
+                if(locaisRecentes.size() > 50)
+                    locaisRecentes.remove(0);
                 latitude = location.getLatitude();
                 longitude = location.getLongitude();
                 String s = String.format(
@@ -98,8 +104,8 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
-                    2000,
-                    10,
+                    120000,
+                    200,
                     locationListener
             );
         }
@@ -125,8 +131,8 @@ public class MainActivity extends AppCompatActivity {
                 if(ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     locationManager.requestLocationUpdates(
                             LocationManager.GPS_PROVIDER,
-                            2000,
-                            10,
+                            120000,
+                            200,
                             locationListener
                     );
                 }
